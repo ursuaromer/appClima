@@ -231,7 +231,7 @@ const Weather = () => {
           </View>
         )}
 
-        {/* Componentes adicionales */}
+        {/* Componentes de Dias por Horas */}
         <PronosticoPorDias city={city}/>
         <PronosticoPorHoras city={city}/>
       </ScrollView>

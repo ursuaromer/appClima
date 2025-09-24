@@ -232,8 +232,8 @@ const Weather = () => {
         )}
 
         {/* Componentes de Dias por Horas */}
-        <PronosticoPorDias city={city}/>
-        <PronosticoPorHoras city={city}/>
+        <PronosticoPorHoras city={city}/>  {/* Horas */}
+        <PronosticoPorDias city={city}/>  {/* Días  */}
       </ScrollView>
 
       {/* Eliminado Modal, ahora dropdown debajo del input */}

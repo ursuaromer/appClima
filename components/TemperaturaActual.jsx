@@ -1,23 +1,22 @@
 
-import React, { useState, useRef } from 'react';
-import styles from '../styles/temperaturaActual.js';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useRef, useState } from 'react';
 import {
-  View,
+  ActivityIndicator,
+  Image,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  Modal,
-  ActivityIndicator,
-  Image,
-  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import PronosticoPorHoras from './PronosticoPorHoras';
-import PronosticoPorDias from './PronosticoPorDias';
-import useWeather from '../hooks/useWeather';
 import useCityAutocomplete from '../hooks/useCityAutocomplete';
+import useWeather from '../hooks/useWeather';
+import styles from '../styles/temperaturaActual.js';
+import PronosticoPorDias from './PronosticoPorDias';
+import PronosticoPorHoras from './PronosticoPorHoras';
 
 const Weather = () => {
   const [city, setCity] = useState('Pucallpa');
@@ -25,11 +24,12 @@ const Weather = () => {
   const [inputValue, setInputValue] = useState('');
   const [showModal, setShowModal] = useState(false);
   const inputRef = useRef(null);
+  const router = useRouter();
 
   // Weather hook
   const { weatherData, loading, error, retry, getCountryName } = useWeather(city, country);
   // Autocomplete hook
-  const { suggestions, loadingSuggestions, closeModal } = useCityAutocomplete(showModal, inputValue);
+  const { suggestions, loadingSuggestions } = useCityAutocomplete(showModal, inputValue);
 
   // Handlers
   const handleInputChange = (value) => {
@@ -134,7 +134,7 @@ const Weather = () => {
                 style={styles.searchButton}
                 onPress={() => inputRef.current?.focus()}
               >
-                <Icon name="search" size={20} color="#666" />
+                <MaterialIcons name="search" size={20} color="#666" />
               </TouchableOpacity>
             </View>
             {/* Sugerencias tipo dropdown debajo del input */}
@@ -230,6 +230,25 @@ const Weather = () => {
             </View>
           </View>
         )}
+
+        {/* Botones de navegación */}
+        <View style={styles.navigationButtonsContainer}>
+          <TouchableOpacity 
+            style={styles.navigationButton}
+            onPress={() => router.push('/pronostico-dias')}
+          >
+            <MaterialIcons name="calendar-today" size={24} color="#007AFF" />
+            <Text style={styles.navigationButtonText}>Pronóstico por Días</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.navigationButton}
+            onPress={() => router.push('/pronostico-horas')}
+          >
+            <MaterialIcons name="schedule" size={24} color="#007AFF" />
+            <Text style={styles.navigationButtonText}>Pronóstico por Horas</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Componentes de Dias por Horas */}
         <PronosticoPorDias city={city}/>

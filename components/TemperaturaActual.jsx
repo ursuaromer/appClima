@@ -1,6 +1,5 @@
-
-import React, { useState, useRef } from 'react';
-import styles from '../styles/temperaturaActual.js';
+import React, { useState, useRef } from "react";
+import styles from "../styles/temperaturaActual.js";
 import {
   View,
   Text,
@@ -11,25 +10,33 @@ import {
   ActivityIndicator,
   Image,
   TouchableWithoutFeedback,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import PronosticoPorHoras from './PronosticoPorHoras';
-import PronosticoPorDias from './PronosticoPorDias';
-import useWeather from '../hooks/useWeather';
-import useCityAutocomplete from '../hooks/useCityAutocomplete';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import useWeather from "../hooks/useWeather";
+import useCityAutocomplete from "../hooks/useCityAutocomplete";
+import styl from "../styles/buttons/buttonsLayout.js";
+import { useRouter } from "expo-router";
+
 
 const Weather = () => {
-  const [city, setCity] = useState('Pucallpa');
-  const [country, setCountry] = useState('PE');
-  const [inputValue, setInputValue] = useState('');
+  const [city, setCity] = useState("Pucallpa");
+  const [country, setCountry] = useState("PE");
+  const [inputValue, setInputValue] = useState("");
   const [showModal, setShowModal] = useState(false);
   const inputRef = useRef(null);
+   const router = useRouter();
 
   // Weather hook
-  const { weatherData, loading, error, retry, getCountryName } = useWeather(city, country);
+  const { weatherData, loading, error, retry, getCountryName } = useWeather(
+    city,
+    country
+  );
   // Autocomplete hook
-  const { suggestions, loadingSuggestions, closeModal } = useCityAutocomplete(showModal, inputValue);
+  const { suggestions, loadingSuggestions, closeModal } = useCityAutocomplete(
+    showModal,
+    inputValue
+  );
 
   // Handlers
   const handleInputChange = (value) => {
@@ -45,7 +52,7 @@ const Weather = () => {
     setCity(selectedCity.name);
     setCountry(selectedCity.country);
     setShowModal(false);
-    setInputValue('');
+    setInputValue("");
     if (inputRef.current) inputRef.current.clear();
   };
 
@@ -54,7 +61,7 @@ const Weather = () => {
     if (newCity) {
       setCity(newCity);
       setShowModal(false);
-      setInputValue('');
+      setInputValue("");
       if (inputRef.current) inputRef.current.clear();
     }
   };
@@ -99,16 +106,14 @@ const Weather = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
         {/* Sección del encabezado */}
         <View style={styles.headerSection}>
-          <Text style={styles.title}>
-            Clima en {weatherData.name}
-          </Text>
+          <Text style={styles.title}>Clima en {weatherData.name}</Text>
           {weatherData.sys?.country && (
             <View style={styles.countryBadge}>
               <Text style={styles.countryText}>
@@ -130,7 +135,7 @@ const Weather = () => {
                 onFocus={() => inputValue.length > 0 && setShowModal(true)}
                 returnKeyType="search"
               />
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.searchButton}
                 onPress={() => inputRef.current?.focus()}
               >
@@ -139,15 +144,28 @@ const Weather = () => {
             </View>
             {/* Sugerencias tipo dropdown debajo del input */}
             {showModal && inputValue.length > 0 && (
-              <View style={[styles.suggestionsModal, { position: 'absolute', top: 55, left: 0, right: 0, zIndex: 100 }]}> 
-                <ScrollView 
+              <View
+                style={[
+                  styles.suggestionsModal,
+                  {
+                    position: "absolute",
+                    top: 55,
+                    left: 0,
+                    right: 0,
+                    zIndex: 100,
+                  },
+                ]}
+              >
+                <ScrollView
                   style={styles.suggestionsScrollView}
                   keyboardShouldPersistTaps="handled"
                 >
                   {loadingSuggestions ? (
                     <View style={styles.suggestionItem}>
                       <ActivityIndicator size="small" color="#007AFF" />
-                      <Text style={styles.suggestionText}>Buscando ciudades...</Text>
+                      <Text style={styles.suggestionText}>
+                        Buscando ciudades...
+                      </Text>
                     </View>
                   ) : suggestions.length > 0 ? (
                     suggestions.map((suggestion, index) => (
@@ -159,7 +177,9 @@ const Weather = () => {
                         <View style={styles.suggestionMain}>
                           <Text style={styles.suggestionMainText}>
                             {suggestion.name}
-                            {suggestion.state && <Text>, {suggestion.state}</Text>}
+                            {suggestion.state && (
+                              <Text>, {suggestion.state}</Text>
+                            )}
                           </Text>
                         </View>
                         <Text style={styles.suggestionCountry}>
@@ -207,7 +227,9 @@ const Weather = () => {
             </View>
             <View style={styles.detailItem}>
               <Text style={styles.label}>Viento:</Text>
-              <Text style={styles.value}>{weatherData.wind?.speed || 0} m/s</Text>
+              <Text style={styles.value}>
+                {weatherData.wind?.speed || 0} m/s
+              </Text>
             </View>
           </View>
         </View>
@@ -217,12 +239,12 @@ const Weather = () => {
           <View style={styles.weatherDescription}>
             <View style={styles.condition}>
               <Text style={styles.conditionText}>
-                {weatherData.weather[0].description.charAt(0).toUpperCase() + 
-                weatherData.weather[0].description.slice(1)}
+                {weatherData.weather[0].description.charAt(0).toUpperCase() +
+                  weatherData.weather[0].description.slice(1)}
               </Text>
-              <Image 
+              <Image
                 source={{
-                  uri: `https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`
+                  uri: `https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`,
                 }}
                 style={styles.weatherIcon}
                 resizeMode="contain"
@@ -230,15 +252,30 @@ const Weather = () => {
             </View>
           </View>
         )}
-
-        {/* Componentes de Dias por Horas */}
-        <PronosticoPorHoras city={city}/>  {/* Horas */}
-        <PronosticoPorDias city={city}/>  {/* Días  */}
       </ScrollView>
 
-      {/* Eliminado Modal, ahora dropdown debajo del input */}
+
+        {/* Botones de Redireccionamiento a los componentes de Prosnotico por dias y por Horas */}
+      <View style={{ flex: 1 }}>
+        <View style={styl.bottomBar}>
+          <TouchableOpacity
+            style={styl.button}
+            onPress={() => router.push({ pathname: "/PronosticoPorHoras", params: { city } })}
+          >
+            <Text style={styl.buttonText}>Pronóstico por Horas</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styl.button}
+            onPress={() => router.push({ pathname: "/PronosticoPorDias", params: { city } })}
+          >
+            <Text style={styl.buttonText}>Pronóstico por Días</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+
     </SafeAreaView>
   );
-}
+};
 
 export default Weather;

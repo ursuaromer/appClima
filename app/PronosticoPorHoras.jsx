@@ -5,6 +5,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { usePronosticoPorHoras } from '../hooks/usePronosticoPorHoras';
 import { getWeatherEmoji } from '../utils/weatherHelpersHoras';
 import { styles } from '../styles/pronosticoPorHoras';
+import { useLocalSearchParams } from "expo-router";
+
 
 const formatTime = (date) => date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false });
 const formatDate = (date) => date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
@@ -53,7 +55,10 @@ const renderHourlyItem = ({ item, index }) => {
   );
 };
 
-const PronosticoPorHoras = ({ city }) => {
+const PronosticoPorHoras = () => {
+// Usa city como prop
+  const { city } = useLocalSearchParams();
+
   const { weatherData, loading, error, refreshing, onRefresh } = usePronosticoPorHoras(city, 24);
 
   if (loading && !refreshing) {

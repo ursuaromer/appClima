@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { usePronosticoPorDias } from '../hooks/usePronosticoPorDias';
 import { getWeatherGradient, getWeatherEmoji } from '../utils/weatherHelpers';
 import { styles } from '../styles/pronosticoPorDias';
+import { useLocalSearchParams } from "expo-router";
 
 const formatDate = (date) => {
   const today = new Date();
@@ -82,7 +83,9 @@ const renderDayItem = ({ item }) => {
   );
 };
 
-const PronosticoPorDias = ({ city, days = 7 }) => {
+const PronosticoPorDias = ({ days = 7 }) => {
+    const { city } = useLocalSearchParams();
+  
   const { weatherData, loading, refreshing, locationInfo, onRefresh } = usePronosticoPorDias(city, days);
 
   if (loading) {

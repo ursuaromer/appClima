@@ -17,15 +17,19 @@ import useWeather from "../hooks/useWeather";
 import useCityAutocomplete from "../hooks/useCityAutocomplete";
 import styl from "../styles/buttons/buttonsLayout.js";
 import { useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 
 
 const Weather = () => {
-  const [city, setCity] = useState("Pucallpa");
-  const [country, setCountry] = useState("PE");
+  const { ci } = useLocalSearchParams();// Prop en la ruta 
+  const [city, setCity] = useState(ci||"Pucallpa"); //Si hay una String de ciudad en la ruta, se usa, sino Pucallpa
+  const [country, setCountry] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [showModal, setShowModal] = useState(false);
   const inputRef = useRef(null);
-   const router = useRouter();
+  const router = useRouter();
+
+
 
   // Weather hook
   const { weatherData, loading, error, retry, getCountryName } = useWeather(
@@ -38,7 +42,45 @@ const Weather = () => {
     inputValue
   );
 
-  // Handlers
+  // Función para convertir grados a punto cardinal
+  const getWindDirection = (degrees) => {
+    if (!degrees) return "N/A";
+    const directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+    const index = Math.round(degrees / 22.5) % 16;
+    return directions[index];
+  };
+
+  // Función para formatear hora
+  const formatTime = (timestamp) => {
+    if (!timestamp) return "N/A";
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleTimeString('es-ES', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: false 
+    });
+  };
+
+  // Función para calcular duración del día
+  const getDayDuration = (sunrise, sunset) => {
+    if (!sunrise || !sunset) return "N/A";
+    const duration = sunset - sunrise;
+    const hours = Math.floor(duration / 3600);
+    const minutes = Math.floor((duration % 3600) / 60);
+    return `${hours}h ${minutes}m`;
+  };
+
+  // Función para obtener descripción de visibilidad
+  const getVisibilityDescription = (visibility) => {
+    if (!visibility) return "N/A";
+    const km = visibility / 1000;
+    if (km >= 10) return `${km.toFixed(1)} km (Excelente)`;
+    if (km >= 5) return `${km.toFixed(1)} km (Buena)`;
+    if (km >= 2) return `${km.toFixed(1)} km (Moderada)`;
+    return `${km.toFixed(1)} km (Pobre)`;
+  };
+
+  // Handlers (mantener los existentes)
   const handleInputChange = (value) => {
     setInputValue(value);
     if (value.length > 0 && !showModal) {
@@ -111,9 +153,9 @@ const Weather = () => {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Sección del encabezado */}
+        {/* Sección del encabezado - mantener igual */}
         <View style={styles.headerSection}>
-          <Text style={styles.title}>Clima en {weatherData.name}</Text>
+          <Text style={styles.title}>{weatherData.name}</Text>
           {weatherData.sys?.country && (
             <View style={styles.countryBadge}>
               <Text style={styles.countryText}>
@@ -121,7 +163,15 @@ const Weather = () => {
               </Text>
             </View>
           )}
-          {/* Input de búsqueda */}
+          
+          {/* Coordenadas */}
+          {weatherData.coord && (
+            <Text style={styles.coordinates}>
+              Lat: {weatherData.coord.lat.toFixed(4)}, Lon: {weatherData.coord.lon.toFixed(4)}
+            </Text>
+          )}
+
+          {/* Input de búsqueda - mantener igual */}
           <View style={styles.searchContainer}>
             <View style={styles.inputWrapper}>
               <TextInput
@@ -142,7 +192,8 @@ const Weather = () => {
                 <Icon name="search" size={20} color="#666" />
               </TouchableOpacity>
             </View>
-            {/* Sugerencias tipo dropdown debajo del input */}
+            
+            {/* Modal de sugerencias - mantener igual */}
             {showModal && inputValue.length > 0 && (
               <View
                 style={[
@@ -206,7 +257,7 @@ const Weather = () => {
           </View>
         </View>
 
-        {/* Información principal del clima */}
+        {/* Información principal del clima - MEJORADA */}
         <View style={styles.weatherMain}>
           <View style={styles.temperatureSection}>
             <Text style={styles.mainTemp}>
@@ -215,48 +266,114 @@ const Weather = () => {
             <Text style={styles.feelsLike}>
               Sensación: {Math.round(weatherData.main.feels_like)}°C
             </Text>
-          </View>
-          <View style={styles.weatherDetails}>
-            <View style={styles.detailItem}>
-              <Text style={styles.label}>Humedad:</Text>
-              <Text style={styles.value}>{weatherData.main.humidity}%</Text>
-            </View>
-            <View style={styles.detailItem}>
-              <Text style={styles.label}>Presión:</Text>
-              <Text style={styles.value}>{weatherData.main.pressure} hPa</Text>
-            </View>
-            <View style={styles.detailItem}>
-              <Text style={styles.label}>Viento:</Text>
-              <Text style={styles.value}>
-                {weatherData.wind?.speed || 0} m/s
+            
+            {/* Temperaturas min/max */}
+            <View style={styles.tempRange}>
+              <Text style={styles.tempRangeText}>
+                Min: {Math.round(weatherData.main.temp_min)}°C
+              </Text>
+              <Text style={styles.tempRangeText}>
+                Max: {Math.round(weatherData.main.temp_max)}°C
               </Text>
             </View>
           </View>
         </View>
 
-        {/* Descripción del clima */}
-        {weatherData.weather && weatherData.weather[0] && (
-          <View style={styles.weatherDescription}>
-            <View style={styles.condition}>
-              <Text style={styles.conditionText}>
-                {weatherData.weather[0].description.charAt(0).toUpperCase() +
-                  weatherData.weather[0].description.slice(1)}
-              </Text>
-              <Image
-                source={{
-                  uri: `https://openweathermap.org/img/w/${weatherData.weather[0].icon}.png`,
-                }}
-                style={styles.weatherIcon}
-                resizeMode="contain"
-              />
+        {/* Grid de detalles mejorado */}
+        <View style={styles.detailsGrid}>
+          {/* Fila 1 */}
+          <View style={styles.detailsRow}>
+            <View style={styles.detailCard}>
+              <Icon name="opacity" size={24} color="#4A90E2" />
+              <Text style={styles.detailLabel}>Humedad</Text>
+              <Text style={styles.detailValue}>{weatherData.main.humidity}%</Text>
+            </View>
+            <View style={styles.detailCard}>
+              <Icon name="speed" size={24} color="#4A90E2" />
+              <Text style={styles.detailLabel}>Presión</Text>
+              <Text style={styles.detailValue}>{weatherData.main.pressure}</Text>
+              <Text style={styles.detailUnit}>hPa</Text>
             </View>
           </View>
-        )}
+
+          {/* Fila 2 - Viento */}
+          <View style={styles.detailsRow}>
+            <View style={styles.detailCard}>
+              <Icon name="air" size={24} color="#4A90E2" />
+              <Text style={styles.detailLabel}>Viento</Text>
+              <Text style={styles.detailValue}>
+                {weatherData.wind?.speed || 0} m/s
+              </Text>
+              <Text style={styles.detailDirection}>
+                {getWindDirection(weatherData.wind?.deg)}
+              </Text>
+            </View>
+            {weatherData.wind?.gust && (
+              <View style={styles.detailCard}>
+                <Icon name="toys" size={24} color="#4A90E2" />
+                <Text style={styles.detailLabel}>Ráfagas</Text>
+                <Text style={styles.detailValue}>{weatherData.wind.gust} m/s</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Fila 3 - Visibilidad y Nubosidad */}
+          <View style={styles.detailsRow}>
+            {weatherData.visibility && (
+              <View style={styles.detailCard}>
+                <Icon name="visibility" size={24} color="#4A90E2" />
+                <Text style={styles.detailLabel}>Visibilidad</Text>
+                <Text style={styles.detailValue}>
+                  {getVisibilityDescription(weatherData.visibility)}
+                </Text>
+              </View>
+            )}
+            {weatherData.clouds && (
+              <View style={styles.detailCard}>
+                <Icon name="cloud" size={24} color="#4A90E2" />
+                <Text style={styles.detailLabel}>Nubosidad</Text>
+                <Text style={styles.detailValue}>{weatherData.clouds.all}%</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Fila 4 - Amanecer y Atardecer */}
+          {weatherData.sys && (
+            <View style={styles.sunSection}>
+              <Text style={styles.sunSectionTitle}>Información Solar</Text>
+              <View style={styles.detailsRow}>
+                <View style={styles.detailCard}>
+                  <Icon name="wb-sunny" size={24} color="#FFA500" />
+                  <Text style={styles.detailLabel}>Amanecer</Text>
+                  <Text style={styles.detailValue}>
+                    {formatTime(weatherData.sys.sunrise)}
+                  </Text>
+                </View>
+                <View style={styles.detailCard}>
+                  <Icon name="brightness-2" size={24} color="#FF6B6B" />
+                  <Text style={styles.detailLabel}>Atardecer</Text>
+                  <Text style={styles.detailValue}>
+                    {formatTime(weatherData.sys.sunset)}
+                  </Text>
+                </View>
+              </View>
+
+               <View style={styles.dayDurationCard}>
+                <Text style={styles.dayDurationLabel}>Duración del día:</Text>
+                <Text style={styles.dayDurationValue}>
+                  {getDayDuration(weatherData.sys.sunrise, weatherData.sys.sunset)}
+                </Text>
+              </View>
+           
+            </View>
+          )}
+        </View>
+          
       </ScrollView>
+      
 
-
-        {/* Botones de Redireccionamiento a los componentes de Prosnotico por dias y por Horas */}
-      <View style={{ flex: 1 }}>
+      {/* Botones de Redireccionamiento - mantener igual */}
+      <View>
         <View style={styl.bottomBar}>
           <TouchableOpacity
             style={styl.button}
@@ -272,8 +389,6 @@ const Weather = () => {
           </TouchableOpacity>
         </View>
       </View>
-
-
     </SafeAreaView>
   );
 };

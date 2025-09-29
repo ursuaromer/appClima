@@ -215,6 +215,117 @@ const styles = StyleSheet.create({
     color: '#999',
     textAlign: 'center',
   },
+
+  // Coordenadas
+  coordinates: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 4,
+  },
+
+  // Rango de temperatura
+  tempRange: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 8,
+  },
+  tempRangeText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+
+  // Grid de detalles
+  detailsGrid: {
+    padding: 16,
+  },
+  detailsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  detailCard: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    padding: 16,
+    flex: 1,
+    marginHorizontal: 4,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  detailLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  detailValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  detailUnit: {
+    fontSize: 10,
+    color: '#999',
+    marginTop: 2,
+  },
+  detailDirection: {
+    fontSize: 12,
+    color: '#4A90E2',
+    marginTop: 2,
+    fontWeight: '600',
+  },
+
+  // Sección solar
+  sunSection: {
+    marginTop: 20,
+    marginBottom: 50,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  sunSectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  dayDurationCard: {
+    backgroundColor: '#f0f8ff',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 0,
+    alignItems: 'center',
+  },
+  dayDurationLabel: {
+    fontSize: 14,
+    color: '#666',
+  },
+  dayDurationValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#4A90E2',
+    marginTop: 4,
+  },
 });
 
 export default styles;

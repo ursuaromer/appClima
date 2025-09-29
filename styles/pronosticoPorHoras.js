@@ -61,17 +61,17 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#f9f9f9ff',
     marginBottom: 8,
   },
   location: {
     fontSize: 16,
-    color: '#4B5563',
+    color: '#ffffffff',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#ffffffff',
   },
   flatListContent: {
     paddingBottom: 20,

@@ -1,5 +1,5 @@
 import { Text, View } from "react-native";
-import VistaPrincipal from "../components/VistaPrincipal.jsx";
+import VistaPrincipal from "./TemperaturaActual";
 
 import { ScrollView } from 'react-native';
 
